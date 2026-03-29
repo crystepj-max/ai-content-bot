@@ -1,0 +1,18 @@
+# Environment
+.env
+.env.local
+*.log
+
+# Cache
+.cache/
+__pycache__/
+*.pyc
+*.pyo
+
+# Output (generated articles)
+output/articles/*.md
+output/articles/*.json
+
+# OS
+.DS_Store
+*.swp
