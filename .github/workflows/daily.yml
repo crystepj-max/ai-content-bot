@@ -20,7 +20,7 @@ on:
 
 env:
   MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
   TWITTER_BEARER_TOKEN: ${{ secrets.TWITTER_BEARER_TOKEN }}
   WECHAT_APP_ID: ${{ secrets.WECHAT_APP_ID }}
   WECHAT_APP_SECRET: ${{ secrets.WECHAT_APP_SECRET }}
