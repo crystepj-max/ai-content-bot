@@ -5,7 +5,7 @@ on:
   schedule:
     - cron: "0 22 * * *"
 
-  # 手动触发（方便调试）
+  # 手动触发
   workflow_dispatch:
     inputs:
       mode:
@@ -14,12 +14,12 @@ on:
         default: "full"
         type: choice
         options:
-          - full        # 完整流程（采集+写作）
-          - fetch-only  # 只采集，不写作
-          - write-only  # 只写作（用缓存）
+          - full        # 完整流程
+          - fetch-only  # 只采集
+          - write-only  # 只写作
 
 env:
-  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+  MINIMAX_API_KEY: ${{ secrets.MINIMAX_API_KEY }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   TWITTER_BEARER_TOKEN: ${{ secrets.TWITTER_BEARER_TOKEN }}
   WECHAT_APP_ID: ${{ secrets.WECHAT_APP_ID }}
@@ -35,7 +35,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: 设置 Python 环境
+      - name: 设置 Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -44,8 +44,7 @@ jobs:
       - name: 安装依赖
         run: pip install -r requirements.txt
 
-      # 恢复缓存（已处理过的 URL，避免重复）
-      - name: 恢复采集缓存
+      - name: 恢复缓存
         uses: actions/cache@v4
         with:
           path: .cache/
@@ -53,69 +52,21 @@ jobs:
           restore-keys: |
             seen-cache-
 
-      - name: 运行主流程
+      - name: 运行
         run: |
           MODE="${{ github.event.inputs.mode || 'full' }}"
           if [ "$MODE" = "fetch-only" ]; then
-            python main.py --fetch-only
+            python main.py --skip-x --fetch-only
           elif [ "$MODE" = "write-only" ]; then
-            python main.py --write-only
+            python main.py --skip-x --write-only
           else
-            python main.py
+            python main.py --skip-x
           fi
 
-      # 把生成的文章上传为 artifact，供下一步（发布）使用
-      - name: 上传文章 artifact
+      - name: 上传文章
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: articles-${{ github.run_id }}
           path: output/articles/
           retention-days: 3
-
-  # 发布 job（依赖写作完成）
-  # 注意：baoyu-skills 需要在本地 Claude Code 环境运行
-  # 这里仅做配图和知乎发布（无需浏览器的部分）
-  publish-zhihu:
-    name: 发布到知乎
-    needs: content-pipeline
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: 下载文章
-        uses: actions/download-artifact@v4
-        with:
-          name: articles-${{ github.run_id }}
-          path: output/articles/
-
-      - name: 设置 Node.js（baoyu-skills 需要）
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-
-      - name: 安装 baoyu-skills
-        run: npx skills add jimliu/baoyu-skills
-
-      - name: 格式化文章
-        run: |
-          for f in output/articles/*.md; do
-            echo "格式化: $f"
-            npx baoyu-skills format-markdown "$f" || true
-          done
-
-      # 微信公众号发布（API 模式，无需浏览器）
-      - name: 发布到微信公众号
-        if: env.WECHAT_APP_ID != ''
-        env:
-          WECHAT_APP_ID: ${{ secrets.WECHAT_APP_ID }}
-          WECHAT_APP_SECRET: ${{ secrets.WECHAT_APP_SECRET }}
-        run: |
-          for f in output/articles/*-formatted.md; do
-            echo "发布: $f"
-            npx baoyu-skills post-to-wechat 文章 --markdown "$f" || true
-            sleep 5
-          done
