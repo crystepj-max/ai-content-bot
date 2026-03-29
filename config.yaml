@@ -1,0 +1,174 @@
+# ============================================================
+# AI 内容机器人配置文件
+# ============================================================
+
+# ---------- 内容主题过滤 ----------
+topics:
+  keywords:
+    - LLM
+    - 大模型
+    - Claude
+    - GPT
+    - Gemini
+    - Llama
+    - Agent
+    - AI Agent
+    - RAG
+    - MCP
+    - OpenClaw
+    - Harness
+    - 推理模型
+    - 多模态
+    - fine-tuning
+    - RLHF
+    - transformer
+    - diffusion
+    - prompt engineering
+    - AI infrastructure
+
+  # GitHub 项目过滤标签
+  github_topics:
+    - llm
+    - large-language-model
+    - ai-agent
+    - rag
+    - chatbot
+    - generative-ai
+    - openai
+    - anthropic
+    - langchain
+    - llamaindex
+
+# ---------- 数据源配置 ----------
+sources:
+
+  # 官方博客 RSS
+  rss_feeds:
+    - name: Anthropic Blog
+      url: https://www.anthropic.com/rss.xml
+      weight: 10
+    - name: OpenAI Blog
+      url: https://openai.com/news/rss/
+      weight: 10
+    - name: Google DeepMind Blog
+      url: https://deepmind.google/blog/rss.xml
+      weight: 9
+    - name: Meta AI Blog
+      url: https://ai.meta.com/blog/rss/
+      weight: 8
+    - name: Mistral Blog
+      url: https://mistral.ai/news/rss/
+      weight: 7
+    - name: Hugging Face Blog
+      url: https://huggingface.co/blog/feed.xml
+      weight: 8
+    - name: xAI Blog
+      url: https://x.ai/blog/rss.xml
+      weight: 7
+
+  # X / Twitter KOL 账号列表
+  x_accounts:
+    - handle: sama           # Sam Altman
+      weight: 10
+    - handle: karpathy        # Andrej Karpathy
+      weight: 10
+    - handle: demishassabis   # Demis Hassabis
+      weight: 9
+    - handle: ylecun          # Yann LeCun
+      weight: 9
+    - handle: darioamodei     # Dario Amodei
+      weight: 10
+    - handle: gdb             # Greg Brockman
+      weight: 8
+    - handle: ilyasut         # Ilya Sutskever
+      weight: 9
+    - handle: DrJimFan        # Jim Fan (NVIDIA)
+      weight: 8
+    - handle: swyx             # swyx (AI News)
+      weight: 7
+    - handle: bindureddy      # Bindu Reddy
+      weight: 6
+
+  # GitHub 抓取配置
+  github:
+    min_stars_7d: 300         # 7天内最少涨星数
+    min_total_stars: 500      # 最少总 star 数
+    max_age_days: 7           # 只看最近7天更新的
+    languages:
+      - Python
+      - TypeScript
+      - Rust
+      - ""                    # 不限语言
+
+# ---------- 评分权重 ----------
+scoring:
+  freshness_weight: 0.35      # 新鲜度（越新越高）
+  engagement_weight: 0.40     # 互动量（点赞/转发/star）
+  relevance_weight: 0.25      # 话题相关度
+
+  # 每日最多产出文章数
+  max_articles_per_day: 3
+
+  # 评分阈值，低于此分数不写文章
+  min_score: 0.45
+
+# ---------- 写作配置 ----------
+writing:
+  language: zh                # 输出语言（中文）
+  tone: professional          # 专业但不失可读性
+  min_words: 800
+  max_words: 2000
+
+  # 写作引擎：MiniMax API (OpenAI-compatible)
+  # 三种文章模板
+  templates:
+    model_release:            # 大模型发布/评测
+      structure:
+        - 一句话结论（核心变化）
+        - 核心能力对比（vs 上一代）
+        - benchmark 数据解读
+        - 对开发者/应用层的影响
+        - 作者判断与展望
+    github_project:           # GitHub 项目介绍
+      structure:
+        - 解决什么问题
+        - 技术原理简述
+        - 与现有方案对比
+        - 快速上手指南
+        - 适合谁用
+    kol_insight:              # KOL 观点解读
+      structure:
+        - 核心论点提炼
+        - 背景与上下文补充
+        - 多角度分析
+        - 延伸思考
+
+# ---------- 发布配置 ----------
+publishing:
+  platforms:
+    zhihu:
+      enabled: true
+      # 知乎专栏 ID，从 URL 获取
+      column_id: ""
+
+    wechat:
+      enabled: true
+      # 通过 baoyu-skills 的 post-to-wechat 发布
+      # 需提前配置 WECHAT_APP_ID 和 WECHAT_APP_SECRET
+
+    hugo_blog:
+      enabled: true
+      content_dir: "./blog/content/posts"
+
+  # 发布时间（北京时间）
+  schedule_hour_cst: 9        # 每天早上9点发布
+
+# ---------- 图片生成 ----------
+images:
+  cover:
+    enabled: true
+    style: editorial          # 适合 AI 技术内容
+    palette: cool
+  article_illustrator:
+    enabled: true
+    style: blueprint          # 技术类文章用蓝图风格
